@@ -4,6 +4,16 @@ class PaymentController < ApplicationController
     PayPal::SDK.load('config/paypal.yml',  ENV['RACK_ENV'] || 'development')
 
     @api = PayPal::SDK::AdaptivePayments.new
+    @receiver = []
+    @user = User.all
+    @user.each do |user|
+      @receiver.push(
+                               {:amount => user.salary,
+                                :email => user.pay_account
+                               }
+      )
+    end
+
 
 # Build request object
     @pay = @api.build_pay({
@@ -13,15 +23,9 @@ class PaymentController < ApplicationController
           :feesPayer => "SENDER",
           :ipnNotificationUrl => "http://localhost:3000",
           :receiverList => {
-              :receiver => [{
-                              :amount => 5,
-                              :email => "seller_kemaodanh@gmail.com"
-                            },
-                            {
-                              :amount => 10,
-                              :email => "white_kemaodanh@gmail.com"
-                            },
-              ]
+
+              :receiver =>  @receiver
+
           },
           :returnUrl => "http://localhost:3000"
                           })
@@ -30,7 +34,7 @@ class PaymentController < ApplicationController
 
 # Access response
     if @response.success?
-   redirect_to @api.payment_url(@response)  # Url to complete payment
+   redirect_to  @api.payment_url(@response)  # Url to complete payment
     else
       @response.error[0].message
     end
