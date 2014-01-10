@@ -7,11 +7,13 @@ class PaymentController < ApplicationController
     @receiver = []
     @user = User.all
     @user.each do |user|
+      if user.status == true
       @receiver.push(
                                {:amount => user.salary,
                                 :email => user.pay_account
                                }
       )
+      end
     end
 
 
