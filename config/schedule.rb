@@ -2,7 +2,7 @@
 #
 # It's helpful, but not entirely necessary to understand cron before proceeding.
 # http://en.wikipedia.org/wiki/Cron
-
+set :environment, "development"
 # Example:
 #
 # set :output, "/path/to/my/cron_log.log"
@@ -19,5 +19,7 @@
 
 # Learn more: http://github.com/javan/whenever
 every 1.month do
-  command "curl http://127.0.0.1:3000/payment"
+
+  rake "db:import"
+
 end

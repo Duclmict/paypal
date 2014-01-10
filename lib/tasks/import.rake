@@ -1,6 +1,8 @@
-class User < ActiveRecord::Base
-  require 'paypal-sdk-adaptivepayments'
-  def payment
+namespace :db do
+  desc "send email automatic"
+  task :import =>[:environment] do
+
+    require 'paypal-sdk-adaptivepayments'
     PayPal::SDK.load('config/paypal.yml',  ENV['RACK_ENV'] || 'development')
 
     @api = PayPal::SDK::AdaptivePayments.new
@@ -36,10 +38,12 @@ class User < ActiveRecord::Base
 
 # Access response
     if @response.success?
-      return  @api.payment_url(@response)  # Url to complete payment
+      @url = @api.payment_url(@response).to_s  # Url to complete payment
+      UserMailer.sendmail(@url).deliver
     else
       @response.error[0].message
-      return "failue"
     end
+
   end
+
 end
